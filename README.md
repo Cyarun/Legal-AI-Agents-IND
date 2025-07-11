@@ -12,10 +12,10 @@
   <b>Advanced AI-powered legal document processing and knowledge graph solutions tailored for the Indian legal system</b>
 </p>
 
-[📚 Documentation](https://github.com/Cyarun/Legal-AI-Agents-IND/wiki) • 
+[📚 Documentation](./Wiki/README.md) • 
 [🚀 Getting Started](#-quick-start) • 
-[🔧 Installation](#-installation) • 
-[💡 Features](#-key-features) • 
+[🔧 Installation](./Wiki/01-Installation-Guide.md) • 
+[🔑 Access Info](./Wiki/02-Access-Credentials.md) • 
 [🤝 Contributing](#-contributing)
 
 </div>
@@ -24,13 +24,36 @@
 
 ## 🌟 Overview
 
-Legal AI Agents for India combines two powerful AI frameworks specifically designed for Indian legal domain applications:
+Legal AI Agents for India combines three powerful AI frameworks specifically designed for Indian legal domain applications:
 
 ### 🔮 **Graphiti** - Temporal Legal Knowledge Graph Framework
 Build and query temporally-aware knowledge graphs for legal intelligence, case law analysis, and statutory interpretation.
 
 ### 📄 **Unstract** - No-Code Document Processing Platform
 Enterprise-grade platform for intelligent document processing, data extraction, and automated legal document analysis.
+
+### 🕸️ **Crawl4AI** - Intelligent Web Crawler (Integrated in Graphiti)
+AI-powered web crawler for automated extraction of legal documents from Indian legal websites.
+
+## 🌐 Access Information
+
+### Production URLs
+- **Unstract Platform**: http://docs.cynorsense.com:80
+- **Unstract API**: http://docs.cynorsense.com:80/api/v2/
+- **API Documentation**: http://docs.cynorsense.com:80/api/v2/swagger/
+
+### Development URLs
+- **Unstract Frontend**: http://localhost:3000
+- **Unstract Backend**: http://localhost:8000
+- **Graphiti API**: http://localhost:8001 (when running)
+
+### Default Credentials
+| Service | Username | Password |
+|---------|----------|----------|
+| PostgreSQL | unstract_dev | unstract_pass |
+| Neo4j | neo4j | password |
+| RabbitMQ | rabbitmq | rabbitmq |
+| MinIO | minio | minio123 |
 
 ## ✨ Key Features
 
@@ -128,9 +151,12 @@ cd Legal-AI-Agents-IND/unstract
 ./run-platform.sh
 
 # Access the platform
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
-# API Docs: http://localhost:8000/api/v2/swagger/
+# Frontend: http://docs.cynorsense.com:80 (via Traefik proxy)
+# Backend API: http://docs.cynorsense.com:80/api/v2/ (proxied to port 8000)
+# API Docs: http://docs.cynorsense.com:80/api/v2/swagger/
+# Direct ports (for development):
+#   - Frontend: http://localhost:3000
+#   - Backend: http://localhost:8000
 ```
 
 ## 🔧 Installation
@@ -187,6 +213,32 @@ cd Legal-AI-Agents-IND/unstract
    ```
 
 </details>
+
+## 🔄 Current System Status
+
+### ✅ Unstract - RUNNING
+- All services operational at http://docs.cynorsense.com:80
+- Backend, Frontend, and all microservices running
+- Accessible via Traefik proxy on port 80
+
+### ⚠️ Graphiti - NOT RUNNING
+- Services not started
+- Requires `.env` configuration
+- Neo4j/FalkorDB needs to be started
+
+### 🕸️ Crawl4AI - INTEGRATED
+- Built into Graphiti at `graphiti/graphiti_core/utils/web_crawler.py`
+- Requires Graphiti to be running to access
+- Supports Indian legal websites
+
+## 🎯 Unified API Approach (Planned)
+
+For a unified API server integrating all three systems, see [Unified API Design](./Wiki/05-Unified-API-Design.md).
+
+### Quick Integration Status:
+- **Crawl4AI ↔ Graphiti**: ✅ Already integrated
+- **Graphiti ↔ Unstract**: ⚠️ Can be integrated via API
+- **Unified API Server**: 📋 Design available
 
 ## 📊 Architecture
 
@@ -292,10 +344,11 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 ## 📚 Documentation
 
-- 📖 [Full Documentation](https://github.com/Cyarun/Legal-AI-Agents-IND/wiki)
-- 🚀 [Getting Started Guide](https://github.com/Cyarun/Legal-AI-Agents-IND/wiki/Getting-Started)
-- 🔧 [API Reference](https://github.com/Cyarun/Legal-AI-Agents-IND/wiki/API-Reference)
-- 💡 [Examples](https://github.com/Cyarun/Legal-AI-Agents-IND/wiki/Examples)
+- 📖 [Full Documentation Wiki](./Wiki/README.md)
+- 🚀 [Installation Guide](./Wiki/01-Installation-Guide.md)
+- 🔑 [Access & Credentials](./Wiki/02-Access-Credentials.md)
+- 🏗️ [Architecture Overview](./Wiki/03-Architecture.md)
+- 🕸️ [Graphiti & Crawl4AI Guide](./Wiki/04-Graphiti-Crawl4AI-Guide.md)
 
 ## 🔒 Security
 
