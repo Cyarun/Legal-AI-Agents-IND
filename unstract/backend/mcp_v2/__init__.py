@@ -1,0 +1,1 @@
+default_app_config = "mcp_v2.apps.McpV2Config"

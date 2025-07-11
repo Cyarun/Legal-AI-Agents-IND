@@ -1,0 +1,188 @@
+# MCP (Model Context Protocol) Configuration for Claude Code
+# This file defines MCP server configurations for Unstract
+
+version: "1.0"
+
+# Claude MCP Server Configuration
+claude:
+  enabled: true
+  endpoint: "${CLAUDE_MCP_ENDPOINT:-https://api.anthropic.com/v1/mcp}"
+  authentication:
+    type: bearer
+    token: "${CLAUDE_API_KEY}"
+  configuration:
+    api_version: "${CLAUDE_API_VERSION:-2024-01-01}"
+    model: "${CLAUDE_DEFAULT_MODEL:-claude-3-opus-20240229}"
+    max_tokens: ${CLAUDE_DEFAULT_MAX_TOKENS:-4096}
+    temperature: ${CLAUDE_DEFAULT_TEMPERATURE:-0.7}
+    system_prompt: |
+      You are an AI assistant integrated with Unstract's document processing pipeline.
+      Help users extract and analyze information from various document types.
+
+# File System MCP Server
+filesystem:
+  enabled: ${MCP_FILESYSTEM_ENABLED:-false}
+  endpoint: "${FILESYSTEM_MCP_ENDPOINT:-http://mcp-filesystem:3000}"
+  authentication:
+    type: none
+  configuration:
+    allowed_paths:
+      - "/app/data"
+      - "/tmp"
+    max_file_size: 10485760  # 10MB
+    allowed_operations:
+      - read
+      - write
+      - list
+
+# GitHub MCP Server
+github:
+  enabled: ${MCP_GITHUB_ENABLED:-false}
+  endpoint: "${GITHUB_MCP_ENDPOINT:-https://api.github.com}"
+  authentication:
+    type: bearer
+    token: "${GITHUB_TOKEN}"
+  configuration:
+    api_version: "2022-11-28"
+    per_page: 30
+    organization: "${GITHUB_ORG}"
+
+# Slack MCP Server
+slack:
+  enabled: ${MCP_SLACK_ENABLED:-false}
+  endpoint: "${SLACK_MCP_ENDPOINT:-https://slack.com/api}"
+  authentication:
+    type: bearer
+    token: "${SLACK_BOT_TOKEN}"
+  configuration:
+    workspace: "${SLACK_WORKSPACE}"
+    default_channel: "${SLACK_DEFAULT_CHANNEL:-general}"
+
+# PostgreSQL MCP Server
+postgres:
+  enabled: ${MCP_POSTGRES_ENABLED:-false}
+  endpoint: "${POSTGRES_MCP_ENDPOINT:-postgresql://localhost:5432}"
+  authentication:
+    type: basic
+    username: "${DB_USER}"
+    password: "${DB_PASSWORD}"
+  configuration:
+    database: "${DB_NAME}"
+    schema: "${DB_SCHEMA:-public}"
+    max_connections: 5
+    query_timeout: 30
+
+# Web Search MCP Server
+web_search:
+  enabled: ${MCP_WEB_SEARCH_ENABLED:-false}
+  endpoint: "${WEB_SEARCH_MCP_ENDPOINT:-https://api.search.brave.com/res/v1}"
+  authentication:
+    type: api_key
+    key: "${BRAVE_SEARCH_API_KEY}"
+    header_name: "X-Subscription-Token"
+  configuration:
+    results_per_page: 10
+    safe_search: moderate
+    country: "${WEB_SEARCH_COUNTRY:-us}"
+
+# Hook Configuration
+hooks:
+  pre_connect:
+    enabled: true
+    timeout: 5
+    retry_on_failure: true
+    
+  post_connect:
+    enabled: true
+    timeout: 5
+    
+  pre_request:
+    enabled: true
+    timeout: 2
+    rate_limit:
+      requests_per_minute: 100
+      burst_size: 20
+      
+  post_request:
+    enabled: true
+    timeout: 2
+    collect_metrics: true
+    
+  validation:
+    enabled: true
+    strict_mode: ${MCP_VALIDATION_STRICT:-false}
+    
+  error_handling:
+    enabled: true
+    retry_policy:
+      max_retries: 3
+      backoff_factor: 2
+      retryable_errors:
+        - timeout
+        - connection_reset
+        - rate_limit
+        - 503
+        - 502
+
+# Rule Configuration
+rules:
+  request_limits:
+    max_request_size: 10485760  # 10MB
+    max_response_size: 52428800  # 50MB
+    
+  timeouts:
+    default_timeout: 30
+    connect_timeout: 10
+    read_timeout: 30
+    
+  rate_limiting:
+    enabled: true
+    global_limit: 1000  # requests per minute
+    per_server_limits:
+      claude: 100
+      github: 500
+      web_search: 60
+      
+  circuit_breaker:
+    enabled: true
+    error_threshold: 10
+    error_window: 300  # 5 minutes
+    recovery_timeout: 60
+    
+  security:
+    block_private_ips: true
+    allowed_schemes:
+      - https
+      - wss
+    sanitize_responses: true
+    log_sensitive_data: false
+
+# Monitoring and Logging
+monitoring:
+  metrics:
+    enabled: true
+    export_interval: 60
+    retention_period: 86400  # 24 hours
+    
+  logging:
+    log_requests: ${MCP_LOG_REQUESTS:-true}
+    log_responses: ${MCP_LOG_RESPONSES:-false}
+    log_errors: true
+    sanitize_logs: true
+    
+  alerts:
+    enabled: ${MCP_ALERTS_ENABLED:-false}
+    channels:
+      - webhook
+    thresholds:
+      error_rate: 0.05  # 5%
+      response_time: 5000  # 5 seconds
+      
+# Feature Flags
+features:
+  circuit_breaker: true
+  rate_limiting: true
+  request_transformation: true
+  response_caching: false
+  async_processing: true
+  batch_requests: false

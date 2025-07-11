@@ -1,0 +1,97 @@
+{
+  "name": "Unstract MCP Configuration",
+  "description": "Claude Code settings for MCP server integration with Unstract",
+  "hooks": {
+    "pre-commit": {
+      "enabled": true,
+      "commands": [
+        "python -m pytest backend/mcp_v2/tests/ -v",
+        "python -m black backend/mcp_v2/ --check",
+        "python -m flake8 backend/mcp_v2/"
+      ]
+    },
+    "post-test": {
+      "enabled": true,
+      "commands": [
+        "echo 'MCP tests completed successfully'"
+      ]
+    }
+  },
+  "mcp": {
+    "servers": {
+      "unstract-claude": {
+        "type": "claude",
+        "endpoint": "${CLAUDE_MCP_ENDPOINT}",
+        "authentication": {
+          "type": "bearer",
+          "token": "${CLAUDE_API_KEY}"
+        },
+        "configuration": {
+          "model": "claude-3-opus-20240229",
+          "max_tokens": 4096
+        }
+      },
+      "unstract-filesystem": {
+        "type": "filesystem",
+        "endpoint": "http://localhost:3001",
+        "configuration": {
+          "allowed_paths": [
+            "/root/project/unstract",
+            "/tmp"
+          ]
+        }
+      },
+      "unstract-github": {
+        "type": "github",
+        "endpoint": "https://api.github.com",
+        "authentication": {
+          "type": "bearer",
+          "token": "${GITHUB_TOKEN}"
+        }
+      }
+    },
+    "rules": {
+      "rate_limiting": {
+        "enabled": true,
+        "limits": {
+          "global": 1000,
+          "per_server": {
+            "claude": 100,
+            "github": 500
+          }
+        }
+      },
+      "timeouts": {
+        "default": 30,
+        "connect": 10
+      },
+      "security": {
+        "block_private_ips": true,
+        "allowed_schemes": ["https", "http", "wss"]
+      }
+    }
+  },
+  "environment": {
+    "variables": {
+      "MCP_ENABLED": "true",
+      "MCP_LOG_REQUESTS": "true",
+      "MCP_VALIDATION_STRICT": "false",
+      "CLAUDE_API_VERSION": "2024-01-01"
+    }
+  },
+  "tools": {
+    "linting": {
+      "python": {
+        "enabled": true,
+        "tools": ["black", "flake8", "mypy"]
+      }
+    },
+    "testing": {
+      "framework": "pytest",
+      "coverage": {
+        "enabled": true,
+        "min_coverage": 80
+      }
+    }
+  }
+}
