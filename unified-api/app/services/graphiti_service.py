@@ -12,6 +12,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "../../../graphiti"))
 
 from graphiti_core import Graphiti
 from graphiti_core.utils.web_crawler import WebCrawler
+from graphiti_core.utils.enhanced_legal_crawler import EnhancedLegalCrawler
 from graphiti_core.search import SearchConfig
 from graphiti_core.llm_client import OpenAIClient
 from graphiti_core.embedder import OpenAIEmbedder
@@ -28,6 +29,7 @@ class GraphitiService:
     def __init__(self):
         self.graphiti: Optional[Graphiti] = None
         self.crawler: Optional[WebCrawler] = None
+        self.enhanced_crawler: Optional[EnhancedLegalCrawler] = None
         self._initialized = False
     
     async def initialize(self):
@@ -54,14 +56,13 @@ class GraphitiService:
         # Initialize web crawler
         self.crawler = WebCrawler(
             llm_provider="openai",
-            api_key=settings.openai_api_key,
-            model=settings.llm_model,
-            verbose=settings.debug,
-            config={
-                "timeout": settings.crawler_timeout,
-                "max_retries": settings.crawler_max_retries,
-                "user_agent": settings.crawler_user_agent
-            }
+            api_key=settings.openai_api_key
+        )
+        
+        # Initialize enhanced legal crawler
+        self.enhanced_crawler = EnhancedLegalCrawler(
+            llm_provider="openai",
+            api_key=settings.openai_api_key
         )
         
         await self.graphiti.build_indices_and_constraints()
@@ -77,12 +78,46 @@ class GraphitiService:
         await self.initialize()
         
         try:
-            # Extract information using crawler
-            extracted_data = await self.crawler.extract_legal_info(
-                url=url,
-                extract_type=extract_type.value,
-                custom_schema=custom_schema
-            )
+            # Use enhanced crawler for supported legal sites
+            if self.enhanced_crawler.is_supported_url(url):
+                legal_doc = await self.enhanced_crawler.extract_legal_document(url)
+                
+                # Convert to dict format
+                extracted_data = {
+                    "title": legal_doc.metadata.title,
+                    "document_type": legal_doc.metadata.document_type,
+                    "jurisdiction": legal_doc.metadata.jurisdiction,
+                    "date": legal_doc.metadata.date,
+                    "citation": legal_doc.metadata.citation,
+                    "parties": legal_doc.metadata.parties or [],
+                    "judges": legal_doc.metadata.judge_names or [],
+                    "keywords": legal_doc.metadata.keywords,
+                    "sections": [
+                        {
+                            "type": section.section_type,
+                            "heading": section.heading,
+                            "content": section.content,
+                            "legal_principles": section.legal_principles or [],
+                            "cited_cases": section.cited_cases or []
+                        }
+                        for section in legal_doc.sections
+                    ],
+                    "summary": legal_doc.summary,
+                    "cyber_law_relevance": legal_doc.cyber_law_relevance,
+                    "key_holdings": legal_doc.key_holdings,
+                    "enhanced_extraction": True
+                }
+                
+                entities_count = len(legal_doc.sections) + len(legal_doc.metadata.keywords)
+                
+            else:
+                # Fallback to basic crawler
+                extracted_data = await self.crawler.crawl_legal_document(
+                    url=url,
+                    use_llm_extraction=True
+                )
+                entities_count = len(extracted_data.get("entities", []))
+                extracted_data["enhanced_extraction"] = False
             
             # Add to knowledge graph
             episode_name = extracted_data.get("title", f"Document from {url}")
@@ -92,9 +127,6 @@ class GraphitiService:
                 source_description=f"Crawled from {url}",
                 reference_time=extracted_data.get("date", datetime.utcnow())
             )
-            
-            # Count entities
-            entities_count = len(extracted_data.get("entities", []))
             
             return {
                 "status": "success",
@@ -200,6 +232,119 @@ class GraphitiService:
         
         return results
     
+    async def enhanced_batch_crawl(
+        self,
+        urls: List[str],
+        extract_type: ExtractType,
+        use_enhanced_only: bool = False
+    ) -> List[Dict[str, Any]]:
+        """Enhanced batch crawl using the enhanced legal crawler."""
+        await self.initialize()
+        
+        results = []
+        
+        # Separate supported and unsupported URLs
+        supported_urls = [url for url in urls if self.enhanced_crawler.is_supported_url(url)]
+        unsupported_urls = [url for url in urls if not self.enhanced_crawler.is_supported_url(url)]
+        
+        # Process supported URLs with enhanced crawler
+        if supported_urls:
+            try:
+                legal_docs = await self.enhanced_crawler.batch_extract_documents(supported_urls)
+                
+                for doc, url in zip(legal_docs, supported_urls):
+                    # Convert to standard format and add to graph
+                    extracted_data = {
+                        "title": doc.metadata.title,
+                        "document_type": doc.metadata.document_type,
+                        "jurisdiction": doc.metadata.jurisdiction,
+                        "date": doc.metadata.date,
+                        "citation": doc.metadata.citation,
+                        "parties": doc.metadata.parties or [],
+                        "judges": doc.metadata.judge_names or [],
+                        "keywords": doc.metadata.keywords,
+                        "sections": [
+                            {
+                                "type": section.section_type,
+                                "heading": section.heading,
+                                "content": section.content,
+                                "legal_principles": section.legal_principles or [],
+                                "cited_cases": section.cited_cases or []
+                            }
+                            for section in doc.sections
+                        ],
+                        "summary": doc.summary,
+                        "cyber_law_relevance": doc.cyber_law_relevance,
+                        "key_holdings": doc.key_holdings,
+                        "enhanced_extraction": True
+                    }
+                    
+                    # Add to knowledge graph
+                    episode_name = extracted_data.get("title", f"Document from {url}")
+                    await self.graphiti.add_episode(
+                        name=episode_name,
+                        episode_body=json.dumps(extracted_data),
+                        source_description=f"Enhanced crawl from {url}",
+                        reference_time=extracted_data.get("date", datetime.utcnow())
+                    )
+                    
+                    results.append({
+                        "status": "success",
+                        "data": extracted_data,
+                        "url": url,
+                        "extracted_at": datetime.utcnow(),
+                        "extraction_type": extract_type.value,
+                        "entities_found": len(doc.sections) + len(doc.metadata.keywords)
+                    })
+                    
+            except Exception as e:
+                # Add error results for supported URLs
+                for url in supported_urls:
+                    results.append({
+                        "status": "failed",
+                        "data": None,
+                        "url": url,
+                        "extracted_at": datetime.utcnow(),
+                        "extraction_type": extract_type.value,
+                        "entities_found": 0,
+                        "error": str(e)
+                    })
+        
+        # Process unsupported URLs with regular crawler (unless use_enhanced_only is True)
+        if unsupported_urls and not use_enhanced_only:
+            for url in unsupported_urls:
+                try:
+                    result = await self.crawl_document(url, extract_type)
+                    results.append(result)
+                except Exception as e:
+                    results.append({
+                        "status": "failed",
+                        "data": None,
+                        "url": url,
+                        "extracted_at": datetime.utcnow(),
+                        "extraction_type": extract_type.value,
+                        "entities_found": 0,
+                        "error": str(e)
+                    })
+        elif unsupported_urls and use_enhanced_only:
+            # Add skipped results for unsupported URLs
+            for url in unsupported_urls:
+                results.append({
+                    "status": "skipped",
+                    "data": None,
+                    "url": url,
+                    "extracted_at": datetime.utcnow(),
+                    "extraction_type": extract_type.value,
+                    "entities_found": 0,
+                    "error": "URL not supported by enhanced crawler"
+                })
+        
+        return results
+    
+    def get_supported_legal_sites(self) -> Dict[str, str]:
+        """Get supported legal websites."""
+        return self.enhanced_crawler.get_supported_domains() if self.enhanced_crawler else {}
+    
     async def get_entity_details(self, entity_id: str) -> Optional[Dict[str, Any]]:
         """Get detailed information about a specific entity."""
         await self.initialize()
@@ -239,6 +384,7 @@ class GraphitiService:
         """Close connections."""
         if self.graphiti:
             await self.graphiti.close()
+        # Enhanced crawler uses async context manager, no explicit close needed
 
 
 # Singleton instance

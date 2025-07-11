@@ -76,6 +76,28 @@ class BatchJobStatus:
     end_time: Optional[datetime] = None
 
 
+@strawberry.type
+class SupportedSite:
+    domain: str
+    site_type: str
+    extraction_quality: str = "high"
+
+
+@strawberry.type
+class ExtractionTest:
+    status: str
+    url: str
+    extraction_time: Optional[float] = None
+    document_type: Optional[str] = None
+    title: Optional[str] = None
+    sections_count: Optional[int] = None
+    cyber_law_relevance: Optional[str] = None
+    keywords: Optional[List[str]] = None
+    site_type: Optional[str] = None
+    supported: bool = False
+    error: Optional[str] = None
+
+
 # Input Types
 @strawberry.input
 class CrawlInput:
@@ -199,6 +221,56 @@ class Query:
             completed_items=0,
             failed_items=0,
             start_time=datetime.now()
+        )
+    
+    @strawberry.field
+    async def get_supported_legal_sites(self, info: Info) -> List[SupportedSite]:
+        """Get list of supported legal websites for enhanced crawling."""
+        auth = info.context.get("auth")
+        if not auth:
+            raise Exception("Authentication required")
+        
+        sites = await graphiti_service.get_supported_legal_sites()
+        return [
+            SupportedSite(
+                domain=domain,
+                site_type=site_type,
+                extraction_quality="high"
+            )
+            for domain, site_type in sites.items()
+        ]
+    
+    @strawberry.field
+    async def test_extraction(self, url: str, info: Info) -> ExtractionTest:
+        """Test extraction capabilities on a URL."""
+        auth = info.context.get("auth")
+        if not auth:
+            raise Exception("Authentication required")
+        
+        await graphiti_service.initialize()
+        
+        if not graphiti_service.enhanced_crawler:
+            return ExtractionTest(
+                status="error",
+                url=url,
+                error="Enhanced crawler not available",
+                supported=False
+            )
+        
+        test_result = await graphiti_service.enhanced_crawler.test_extraction(url)
+        
+        return ExtractionTest(
+            status=test_result.get("status", "error"),
+            url=test_result.get("url", url),
+            extraction_time=test_result.get("extraction_time"),
+            document_type=test_result.get("document_type"),
+            title=test_result.get("title"),
+            sections_count=test_result.get("sections_count"),
+            cyber_law_relevance=test_result.get("cyber_law_relevance"),
+            keywords=test_result.get("keywords"),
+            site_type=test_result.get("site_type"),
+            supported=test_result.get("supported", False),
+            error=test_result.get("error")
         )
 
 

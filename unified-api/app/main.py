@@ -7,7 +7,7 @@ import logging
 from datetime import datetime
 
 from .config import get_settings
-from .routers import crawl, graph, process, legal
+from .routers import crawl, graph, process, legal, enhanced_crawler
 from .services.graphiti_service import graphiti_service
 from .services.unstract_service import unstract_service
 from .utils.cache import close_redis
@@ -174,6 +174,7 @@ app.include_router(crawl.router, prefix=settings.api_prefix)
 app.include_router(graph.router, prefix=settings.api_prefix)
 app.include_router(process.router, prefix=settings.api_prefix)
 app.include_router(legal.router, prefix=settings.api_prefix)
+app.include_router(enhanced_crawler.router, prefix=settings.api_prefix)
 
 # Add GraphQL endpoint
 graphql_app = GraphQLRouter(
@@ -201,6 +202,10 @@ app.openapi_tags = [
     {
         "name": "Legal Analysis",
         "description": "Combined legal analysis workflows"
+    },
+    {
+        "name": "Enhanced Legal Crawler",
+        "description": "Advanced crawler with site-specific extractors for Indian legal websites"
     },
     {
         "name": "GraphQL",
