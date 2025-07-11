@@ -39,7 +39,7 @@ dependencies = [
     # to resolve lock file. Will have to be re-looked into
     "unstract-sdk[azure]~=0.74.0",
     "gcsfs==2024.10.0",
-    "s3fs==2024.10.0",
+    "s3fs==2025.5.1",
     "azure-identity==1.16.0",
     "azure-mgmt-apimanagement==3.0.0",
     "croniter>=3.0.3",
