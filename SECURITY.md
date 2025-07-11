@@ -1,5 +1,7 @@
 # Security Policy
 
+**Maintained by CynorSense Solutions Pvt. Ltd.**
+
 ## Supported Versions
 
 We release patches for security vulnerabilities. Currently supported versions:
@@ -17,7 +19,7 @@ We take the security of Legal AI Agents for India seriously. If you believe you 
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-Instead, please report them via email to: security@legalaiagents.in
+Instead, please report them via email to: email@cynorsense.com
 
 You should receive a response within 48 hours. If for some reason you do not, please follow up via email to ensure we received your original message.
 
@@ -182,9 +184,13 @@ We regularly update our dependencies and security measures:
 
 ## Contact
 
-For security concerns, contact: security@legalaiagents.in
+**CynorSense Solutions Pvt. Ltd.**
 
-For general support: support@legalaiagents.in
+For security concerns, contact: email@cynorsense.com  
+For general support: email@cynorsense.com  
+Website: [www.cynorsense.com](https://cynorsense.com)
+
+**Security Team Lead**: Arun R M
 
 ## Acknowledgments
 

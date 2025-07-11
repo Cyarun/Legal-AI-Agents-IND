@@ -1,6 +1,13 @@
 # Contributing to Legal AI Agents for India
 
-Thank you for your interest in contributing to Legal AI Agents for India! We welcome contributions from the community to help improve and expand our legal AI frameworks.
+Thank you for your interest in contributing to Legal AI Agents for India! This project is maintained by **CynorSense Solutions Pvt. Ltd.** and we welcome contributions from the community to help improve and expand our legal AI frameworks.
+
+## About the Maintainer
+
+**CynorSense Solutions Pvt. Ltd.**  
+Author: Arun R M  
+Email: [email@cynorsense.com](mailto:email@cynorsense.com)  
+Website: [www.cynorsense.com](https://cynorsense.com)
 
 ## Table of Contents
 - [Code of Conduct](#code-of-conduct)

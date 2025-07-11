@@ -1,6 +1,17 @@
 # 📚 Legal AI Agents Wiki
 
+<div align="center">
+<h3>A CynorSense Solutions Product</h3>
+<p><i>Developed by Arun R M</i></p>
+</div>
+
+---
+
 Welcome to the comprehensive documentation for Legal AI Agents for India. This wiki contains detailed guides for installation, configuration, and usage of both Unstract and Graphiti platforms.
+
+**Maintained by**: CynorSense Solutions Pvt. Ltd.  
+**Contact**: [email@cynorsense.com](mailto:email@cynorsense.com)  
+**Website**: [www.cynorsense.com](https://cynorsense.com)
 
 ## 🗂️ Documentation Index
 

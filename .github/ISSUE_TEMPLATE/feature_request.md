@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest an idea for this project
 title: '[FEATURE] '
-labels: 'enhancement'
+labels: enhancement
 assignees: ''
 
 ---
@@ -16,16 +16,11 @@ A clear and concise description of what you want to happen.
 **Describe alternatives you've considered**
 A clear and concise description of any alternative solutions or features you've considered.
 
-**Use Case**
-Please provide a specific use case or example of how this feature would be used in a legal context.
-
-**Project**
-- [ ] Graphiti
-- [ ] Unstract
-- [ ] Both
-
 **Additional context**
 Add any other context or screenshots about the feature request here.
 
-**Potential Implementation**
-If you have ideas about how this could be implemented, please share them here.
+**Business Impact**
+How would this feature benefit legal professionals or improve the platform?
+
+---
+*Feature request submitted to CynorSense Solutions Pvt. Ltd. (email@cynorsense.com)*

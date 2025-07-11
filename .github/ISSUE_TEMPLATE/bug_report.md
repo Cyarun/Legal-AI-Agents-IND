@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a report to help us improve
 title: '[BUG] '
-labels: 'bug'
+labels: bug
 assignees: ''
 
 ---
@@ -25,15 +25,13 @@ If applicable, add screenshots to help explain your problem.
 
 **Environment (please complete the following information):**
  - OS: [e.g. Ubuntu 22.04]
- - Python Version: [e.g. 3.10.5]
- - Node Version: [e.g. 16.14.0] (for Unstract)
- - Project: [Graphiti/Unstract]
- - Version: [e.g. 1.0.0]
+ - Python Version: [e.g. 3.10]
+ - Node Version: [e.g. 16.x]
+ - Docker Version: [e.g. 20.10]
+ - Component: [Unstract/Graphiti/Crawl4AI]
 
 **Additional context**
 Add any other context about the problem here.
 
-**Logs**
-```
-Please paste any relevant log output here
-```
+---
+*Report submitted to CynorSense Solutions Pvt. Ltd. (email@cynorsense.com)*

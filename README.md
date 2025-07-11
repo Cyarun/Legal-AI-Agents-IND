@@ -2,6 +2,9 @@
 
 <div align="center">
 
+<!-- Logo placeholder - replace with actual CynorSense logo -->
+<img src="https://img.shields.io/badge/CynorSense-Solutions-0066CC?style=for-the-badge&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" alt="CynorSense Solutions" />
+
 ![Legal AI Agents](https://img.shields.io/badge/Legal_AI-Agents-blue?style=for-the-badge&logo=law&logoColor=white)
 ![Made for India](https://img.shields.io/badge/Made_for-India-🇮🇳-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
@@ -10,6 +13,10 @@
 
 <p align="center">
   <b>Advanced AI-powered legal document processing and knowledge graph solutions tailored for the Indian legal system</b>
+</p>
+
+<p align="center">
+  <i>Developed by <a href="https://cynorsense.com">CynorSense Solutions Pvt. Ltd.</a></i>
 </p>
 
 [📚 Documentation](./Wiki/README.md) • 
@@ -372,11 +379,22 @@ Security is our top priority. Please review our [Security Policy](SECURITY.md) f
 
 </div>
 
+## 🏢 About CynorSense Solutions
+
+**CynorSense Solutions Pvt. Ltd.** is a leading technology company specializing in AI-powered solutions for the legal industry. We are committed to revolutionizing legal practice in India through cutting-edge artificial intelligence and machine learning technologies.
+
+### 👤 Leadership
+**Arun R M**  
+Founder & CEO  
+CynorSense Solutions Pvt. Ltd.  
+Email: [email@cynorsense.com](mailto:email@cynorsense.com)
+
 ## 🙏 Acknowledgments
 
 - Indian legal community for domain expertise
 - Open source contributors
 - LLM providers for AI capabilities
+- Our clients and partners for their trust and support
 
 ## 📄 License
 
@@ -387,6 +405,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 <div align="center">
 
 **Made with ❤️ for the Indian Legal Community**
+
+**© 2025 CynorSense Solutions Pvt. Ltd.**  
+**Author**: Arun R M  
+**Email**: [email@cynorsense.com](mailto:email@cynorsense.com)  
+**Website**: [www.cynorsense.com](https://cynorsense.com)
 
 [Report Bug](https://github.com/Cyarun/Legal-AI-Agents-IND/issues) • 
 [Request Feature](https://github.com/Cyarun/Legal-AI-Agents-IND/issues) • 
