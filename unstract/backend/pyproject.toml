@@ -19,7 +19,7 @@ dependencies = [
     "flower>=2.0.1",               # Celery Monitoring
     "cron-descriptor==1.4.0",      # For cron string description
     "cryptography>=41.0.7",
-    "django==4.2.1",
+    "django==5.2.4",
     "djangorestframework==3.14.0",
     "django-cors-headers==4.3.1",
     # Pinning django-celery-beat to avoid build issues
