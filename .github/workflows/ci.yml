@@ -1,0 +1,164 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  graphiti-tests:
+    name: Graphiti Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+    
+    - name: Install dependencies
+      working-directory: ./graphiti
+      run: |
+        uv sync
+    
+    - name: Run linting
+      working-directory: ./graphiti
+      run: |
+        make lint
+    
+    - name: Run unit tests
+      working-directory: ./graphiti
+      run: |
+        uv run pytest -m "not integration" --cov=graphiti_core --cov-report=xml
+    
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./graphiti/coverage.xml
+        flags: graphiti
+
+  unstract-backend-tests:
+    name: Unstract Backend Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      working-directory: ./unstract
+      run: |
+        pip install tox
+    
+    - name: Run backend tests
+      working-directory: ./unstract
+      run: |
+        tox
+    
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./unstract/coverage.xml
+        flags: unstract-backend
+
+  unstract-frontend-tests:
+    name: Unstract Frontend Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: unstract/frontend/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: ./unstract/frontend
+      run: |
+        npm ci
+    
+    - name: Run linting
+      working-directory: ./unstract/frontend
+      run: |
+        npm run lint
+    
+    - name: Run tests
+      working-directory: ./unstract/frontend
+      run: |
+        npm test -- --coverage --watchAll=false
+    
+    - name: Build
+      working-directory: ./unstract/frontend
+      run: |
+        npm run build
+
+  docker-build:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Test Graphiti Docker build
+      working-directory: ./graphiti
+      run: |
+        docker-compose build --no-cache
+    
+    - name: Test Unstract Docker build
+      working-directory: ./unstract
+      run: |
+        docker-compose -f docker/docker-compose.yaml build --no-cache
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  documentation:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Check markdown files
+      uses: DavidAnson/markdownlint-cli2-action@v16
+      with:
+        globs: |
+          **/*.md
+          !**/node_modules/**
+          !**/vendor/**
