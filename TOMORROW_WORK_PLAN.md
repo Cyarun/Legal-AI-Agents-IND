@@ -241,25 +241,34 @@ job = client.enhanced_crawler.batch_crawl(
 3. **Documentation**: Ensure mkdocs or similar is available
 4. **Load Testing**: Prepare tools for performance testing
 
+### **FIRST COMMAND TO RUN TOMORROW (MANDATORY):**
+```bash
+cd /root/project/Legal-AI-Agents-IND && git pull origin main && git log --oneline -5 && ls -la
+```
+
 ### Quick Start Commands for Tomorrow
 ```bash
-# Navigate to project
-cd /root/project/Legal-AI-Agents-IND
+# After running the first command above, proceed with:
 
-# Check current status
-git status
-git log --oneline -5
+# Check current status and review plans
+cat CURRENT_STATUS.md | head -20
+cat TOMORROW_WORK_PLAN.md | head -30
+
+# Verify services
+docker-compose ps
+docker-compose up -d neo4j redis
 
 # Start development server
 cd unified-api
 uvicorn app.main:app --reload --port 8080
 
-# Run tests
-pytest tests/ -v
+# Test current functionality
+curl http://localhost:8080/health
+curl http://localhost:8080/api/v1/enhanced-crawler/supported-sites
 
-# Check enhanced crawler
-cd ../graphiti
-python3 test_enhanced_crawler.py
+# Begin rate limiting implementation
+touch unified-api/app/middleware/rate_limiting.py
+touch unified-api/app/utils/rate_limiter.py
 ```
 
 ---
