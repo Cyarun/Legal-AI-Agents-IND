@@ -1,0 +1,143 @@
+version: '3.8'
+
+services:
+  # Unified API Gateway
+  unified-api:
+    build: ./unified-api
+    container_name: unified-legal-api
+    ports:
+      - "8080:8080"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-password}
+      - UNSTRACT_API_URL=http://docs.cynorsense.com:80/api/v2
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - neo4j
+      - redis
+    networks:
+      - unified-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Neo4j for Graphiti
+  neo4j:
+    image: neo4j:5.26.0
+    container_name: unified-neo4j
+    ports:
+      - "7474:7474"  # Neo4j Browser
+      - "7687:7687"  # Bolt protocol
+    environment:
+      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD:-password}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      - NEO4J_dbms_memory_heap_initial__size=512m
+      - NEO4J_dbms_memory_heap_max__size=2G
+      - NEO4J_dbms_memory_pagecache_size=512m
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    networks:
+      - unified-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "neo4j", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: unified-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - unified-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Graphiti API Server (optional - direct integration available)
+  graphiti-api:
+    build:
+      context: ./graphiti/server
+      dockerfile: Dockerfile
+    container_name: graphiti-api
+    ports:
+      - "8001:8001"
+    environment:
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-password}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - neo4j
+    networks:
+      - unified-network
+    restart: unless-stopped
+
+  # Graphiti MCP Server for Claude integration
+  graphiti-mcp:
+    build:
+      context: ./graphiti/mcp_server
+      dockerfile: Dockerfile.legal
+    container_name: graphiti-mcp
+    ports:
+      - "3000:3000"
+    environment:
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-password}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DEFAULT_DATABASE=neo4j
+      - LLM_MODEL=gpt-4o-mini
+    depends_on:
+      - neo4j
+    networks:
+      - unified-network
+    restart: unless-stopped
+
+  # Optional: Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: unified-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - unified-api
+      - neo4j
+    networks:
+      - unified-network
+    restart: unless-stopped
+
+volumes:
+  neo4j_data:
+    driver: local
+  neo4j_logs:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  unified-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

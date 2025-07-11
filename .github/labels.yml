@@ -1,0 +1,149 @@
+# GitHub Labels Configuration
+# Use with: https://github.com/crazy-max/ghaction-github-labeler
+
+# Priority Labels
+- name: "P0-critical"
+  color: "b60205"
+  description: "Critical priority - blocks other work"
+
+- name: "P1-high"
+  color: "d93f0b"
+  description: "High priority - core functionality"
+
+- name: "P2-medium"
+  color: "fbca04"
+  description: "Medium priority - nice to have"
+
+- name: "P3-low"
+  color: "fef2c0"
+  description: "Low priority - future consideration"
+
+# Type Labels
+- name: "epic"
+  color: "3e4b9e"
+  description: "Large feature or project component"
+
+- name: "feature"
+  color: "a2eeef"
+  description: "New feature or request"
+
+- name: "bug"
+  color: "d73a4a"
+  description: "Something isn't working"
+
+- name: "enhancement"
+  color: "84b6eb"
+  description: "Improvement to existing functionality"
+
+- name: "task"
+  color: "d4c5f9"
+  description: "Simple task or subtask"
+
+# Component Labels
+- name: "graphiti"
+  color: "006b75"
+  description: "Related to Graphiti integration"
+
+- name: "unstract"
+  color: "1d76db"
+  description: "Related to Unstract integration"
+
+- name: "unified-api"
+  color: "5319e7"
+  description: "Related to the Unified API gateway"
+
+- name: "infrastructure"
+  color: "0052cc"
+  description: "DevOps, deployment, monitoring"
+
+- name: "frontend"
+  color: "c5def5"
+  description: "UI/UX related"
+
+- name: "documentation"
+  color: "0075ca"
+  description: "Documentation improvements"
+
+# Status Labels
+- name: "planning"
+  color: "eeeeee"
+  description: "In design/planning phase"
+
+- name: "ready"
+  color: "0e8a16"
+  description: "Ready to start work"
+
+- name: "in-progress"
+  color: "ffd93d"
+  description: "Being actively worked on"
+
+- name: "blocked"
+  color: "e11d21"
+  description: "Blocked by dependencies"
+
+- name: "review"
+  color: "c2e0c6"
+  description: "In code review"
+
+- name: "completed"
+  color: "6f42c1"
+  description: "Work completed"
+
+# Other Labels
+- name: "good-first-issue"
+  color: "7057ff"
+  description: "Good for newcomers"
+
+- name: "help-wanted"
+  color: "008672"
+  description: "Extra attention is needed"
+
+- name: "wontfix"
+  color: "ffffff"
+  description: "This will not be worked on"
+
+- name: "duplicate"
+  color: "cfd3d7"
+  description: "This issue or pull request already exists"
+
+- name: "invalid"
+  color: "e4e669"
+  description: "This doesn't seem right"
+
+- name: "question"
+  color: "d876e3"
+  description: "Further information is requested"
+
+# Complexity Labels
+- name: "complexity:XS"
+  color: "c2f2d0"
+  description: "Extra small - few hours"
+
+- name: "complexity:S"
+  color: "a8e6cf"
+  description: "Small - 1 day"
+
+- name: "complexity:M"
+  color: "7fcdbb"
+  description: "Medium - 2-3 days"
+
+- name: "complexity:L"
+  color: "41b6c4"
+  description: "Large - 1 week"
+
+- name: "complexity:XL"
+  color: "2c7fb8"
+  description: "Extra large - 2+ weeks"
+
+# Environment Labels
+- name: "env:development"
+  color: "bfdadc"
+  description: "Development environment"
+
+- name: "env:staging"
+  color: "b2e2e2"
+  description: "Staging environment"
+
+- name: "env:production"
+  color: "66c2a4"
+  description: "Production environment"

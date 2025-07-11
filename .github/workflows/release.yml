@@ -1,0 +1,122 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Get version
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      
+      - name: Generate changelog
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v4
+        with:
+          configuration: ".github/changelog-config.json"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ steps.version.outputs.version }}
+          body: |
+            ## 🚀 Legal AI Agents Release ${{ steps.version.outputs.version }}
+            
+            ### 📋 Changelog
+            ${{ steps.changelog.outputs.changelog }}
+            
+            ### 🐳 Docker Images
+            - `ghcr.io/${{ github.repository_owner }}/legal-ai/unified-api:${{ steps.version.outputs.version }}`
+            - `ghcr.io/${{ github.repository_owner }}/legal-ai/graphiti-server:${{ steps.version.outputs.version }}`
+            - `ghcr.io/${{ github.repository_owner }}/legal-ai/graphiti-mcp:${{ steps.version.outputs.version }}`
+            
+            ### 📚 Documentation
+            - [Deployment Guide](https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.version }}/DEPLOYMENT_GUIDE.md)
+            - [API Documentation](https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.version }}/unified-api/README.md)
+            
+            ### 🔧 Installation
+            ```bash
+            # Using Docker Compose
+            wget https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/docker-compose.prod.yml
+            docker-compose -f docker-compose.prod.yml up -d
+            ```
+          draft: false
+          prerelease: false
+
+  deploy-docs:
+    name: Deploy Documentation
+    needs: release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install MkDocs
+        run: |
+          pip install mkdocs mkdocs-material mkdocs-mermaid2-plugin
+      
+      - name: Build documentation
+        run: |
+          # Create mkdocs.yml if not exists
+          cat > mkdocs.yml << EOF
+          site_name: Legal AI Agents Documentation
+          site_description: Documentation for Legal AI Agents
+          repo_url: https://github.com/${{ github.repository }}
+          theme:
+            name: material
+            features:
+              - navigation.instant
+              - navigation.tracking
+              - navigation.sections
+              - search.highlight
+          plugins:
+            - search
+            - mermaid2
+          nav:
+            - Home: README.md
+            - Deployment: DEPLOYMENT_GUIDE.md
+            - Issue Tracking: ISSUE_TRACKING_GUIDE.md
+            - API Documentation: unified-api/README.md
+            - Wiki:
+              - Installation: Wiki/01-Installation-Guide.md
+              - Architecture: Wiki/03-Architecture.md
+              - Unified API: Wiki/05-Unified-API-Design.md
+          EOF
+          
+          mkdocs build
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          cname: docs.legal-ai-agents.io

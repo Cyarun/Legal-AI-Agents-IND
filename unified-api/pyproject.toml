@@ -1,0 +1,45 @@
+[project]
+name = "unified-legal-api"
+version = "1.0.0"
+description = "Unified API Gateway for Legal AI Agents (Graphiti + Unstract)"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi==0.115.0",
+    "uvicorn[standard]==0.31.1",
+    "httpx==0.27.2",
+    "pydantic==2.10.4",
+    "python-jose[cryptography]==3.3.0",
+    "python-multipart==0.0.17",
+    "redis==5.2.1",
+    "python-dotenv==1.0.1",
+    "neo4j==5.26.0",
+    "aiofiles==24.1.0",
+    "pydantic-settings==2.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.4",
+    "pytest-asyncio==0.24.0",
+    "black==24.10.0",
+    "ruff==0.8.4",
+    "mypy==1.14.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true

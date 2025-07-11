@@ -1,0 +1,215 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      version:
+        description: 'Version to deploy (e.g., v1.0.0)'
+        required: true
+        type: string
+
+env:
+  DEPLOY_USER: deploy
+  
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
+      
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+      
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Deploy to server
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          ENVIRONMENT: ${{ inputs.environment }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          # Create deployment script
+          cat > deploy.sh << 'EOF'
+          #!/bin/bash
+          set -e
+          
+          echo "Deploying Legal AI Agents $VERSION to $ENVIRONMENT"
+          
+          # Navigate to deployment directory
+          cd $DEPLOY_PATH
+          
+          # Backup current deployment
+          if [ -d "current" ]; then
+            cp -r current backup-$(date +%Y%m%d-%H%M%S)
+          fi
+          
+          # Pull latest code
+          git fetch --all --tags
+          git checkout $VERSION
+          
+          # Update environment file
+          cp .env.$ENVIRONMENT .env.prod
+          
+          # Pull new images
+          docker-compose -f docker-compose.prod.yml pull
+          
+          # Stop services gracefully
+          docker-compose -f docker-compose.prod.yml stop
+          
+          # Start services with new version
+          docker-compose -f docker-compose.prod.yml up -d
+          
+          # Wait for services to be healthy
+          sleep 30
+          
+          # Run health checks
+          docker-compose -f docker-compose.prod.yml ps
+          curl -f https://api.$DOMAIN/health || exit 1
+          
+          echo "Deployment completed successfully!"
+          EOF
+          
+          # Copy and execute deployment script
+          scp deploy.sh $DEPLOY_USER@$DEPLOY_HOST:/tmp/
+          ssh $DEPLOY_USER@$DEPLOY_HOST "bash /tmp/deploy.sh"
+      
+      - name: Verify deployment
+        run: |
+          # Wait for deployment to stabilize
+          sleep 60
+          
+          # Check API health
+          curl -f https://api.${{ secrets.DOMAIN }}/health
+          
+          # Check version
+          API_VERSION=$(curl -s https://api.${{ secrets.DOMAIN }}/health | jq -r .version)
+          echo "Deployed version: $API_VERSION"
+      
+      - name: Send notification
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Deployment to ${{ inputs.environment }} ${{ job.status }}
+            Version: ${{ inputs.version }}
+            Actor: ${{ github.actor }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+  smoke-tests:
+    name: Run Smoke Tests
+    needs: deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install test dependencies
+        run: |
+          pip install requests pytest
+      
+      - name: Run smoke tests
+        env:
+          API_URL: https://api.${{ secrets.DOMAIN }}
+          API_KEY: ${{ secrets.TEST_API_KEY }}
+        run: |
+          # Create smoke test script
+          cat > smoke_test.py << 'EOF'
+          import requests
+          import os
+          import sys
+          
+          API_URL = os.environ['API_URL']
+          API_KEY = os.environ.get('API_KEY', '')
+          
+          def test_health():
+              response = requests.get(f"{API_URL}/health")
+              assert response.status_code == 200
+              assert response.json()['status'] in ['healthy', 'degraded']
+          
+          def test_api_docs():
+              response = requests.get(f"{API_URL}/docs")
+              assert response.status_code == 200
+          
+          def test_authenticated_endpoint():
+              headers = {'Authorization': f'Bearer {API_KEY}'}
+              response = requests.get(f"{API_URL}/api/v1/graph/schema", headers=headers)
+              assert response.status_code in [200, 401]  # 401 if no valid key
+          
+          if __name__ == '__main__':
+              try:
+                  test_health()
+                  print("✅ Health check passed")
+                  
+                  test_api_docs()
+                  print("✅ API docs accessible")
+                  
+                  test_authenticated_endpoint()
+                  print("✅ Authentication working")
+                  
+                  print("\n🎉 All smoke tests passed!")
+              except AssertionError as e:
+                  print(f"❌ Smoke test failed: {e}")
+                  sys.exit(1)
+              except Exception as e:
+                  print(f"❌ Unexpected error: {e}")
+                  sys.exit(1)
+          EOF
+          
+          python smoke_test.py
+
+  rollback:
+    name: Rollback if needed
+    needs: [deploy, smoke-tests]
+    if: failure()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Rollback deployment
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          ssh $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_PATH && ./scripts/rollback.sh"
+      
+      - name: Notify rollback
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              text: "⚠️ Deployment rolled back due to failures",
+              attachments: [{
+                color: 'danger',
+                text: 'Environment: ${{ inputs.environment }}\nVersion: ${{ inputs.version }}'
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

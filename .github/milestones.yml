@@ -1,0 +1,52 @@
+# GitHub Milestones Configuration
+
+milestones:
+  - title: "v1.0 - Foundation"
+    description: |
+      Production-ready infrastructure and deployment
+      - Complete Docker and Kubernetes setup
+      - CI/CD pipelines
+      - Monitoring and logging
+      - Security hardening
+    due_date: "2024-03-31"
+    state: "open"
+
+  - title: "v1.1 - API Excellence"
+    description: |
+      Feature-complete and performant API
+      - GraphQL implementation
+      - Advanced caching
+      - Rate limiting
+      - Client SDKs
+    due_date: "2024-05-15"
+    state: "open"
+
+  - title: "v1.2 - Legal AI Core"
+    description: |
+      Advanced legal AI capabilities
+      - Extended crawlers
+      - Legal reasoning engine
+      - Citation analysis
+      - Compliance framework
+    due_date: "2024-07-31"
+    state: "open"
+
+  - title: "v1.3 - Integration Deep Dive"
+    description: |
+      Deep Unstract integration
+      - Workflow API
+      - Template library
+      - Batch optimization
+      - Pipeline monitoring
+    due_date: "2024-09-30"
+    state: "open"
+
+  - title: "v2.0 - User Experience"
+    description: |
+      Complete user interfaces
+      - Web dashboard
+      - Mobile app
+      - CLI tools
+      - Browser extension
+    due_date: "2024-12-31"
+    state: "open"
