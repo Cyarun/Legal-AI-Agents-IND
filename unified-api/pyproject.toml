@@ -12,7 +12,7 @@ dependencies = [
     "python-multipart==0.0.17",
     "redis==5.2.1",
     "python-dotenv==1.0.1",
-    "neo4j==5.26.0",
+    "neo4j==5.28.1",
     "aiofiles==24.1.0",
     "pydantic-settings==2.7.0",
     "strawberry-graphql[fastapi]==0.243.1",
