@@ -8,12 +8,30 @@
 
 To democratize access to legal intelligence through advanced AI technologies, making legal research and document processing more efficient, accurate, and accessible for legal professionals across India.
 
-## 👨‍💼 Leadership
+## 👨‍💼 Leadership Team
 
-### Arun R M
-**Founder & Chief Executive Officer**
-
-Arun R M is a visionary technology leader with expertise in artificial intelligence, machine learning, and legal technology. Under his leadership, CynorSense Solutions has developed groundbreaking AI solutions specifically tailored for the Indian legal system.
+<table>
+<tr>
+<td align="center" width="33%">
+<img src="https://media.licdn.com/dms/image/v2/C5603AQHqqQDz2hHcGw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1605174373301?e=2147483647&v=beta&t=njb6Ec_kLJnJL-ZAZWh59QSQgsPQ91ACvXwCANnWGn8" width="150" height="150" /><br>
+<h3>Sri Uday Kiran B</h3>
+<b>Chief Executive Officer</b><br>
+Visionary leader driving CynorSense's mission to transform legal technology in India through innovative AI solutions.
+</td>
+<td align="center" width="33%">
+<img src="https://s3.amazonaws.com/media.mixrank.com/profilepic/98b414045e9b8f0c62635a32f2fb05d" width="150" height="150" /><br>
+<h3>Sri Arun R M</h3>
+<b>Chief Information Officer</b><br>
+Technology strategist with deep expertise in AI and machine learning, architecting cutting-edge legal tech solutions.
+</td>
+<td align="center" width="33%">
+<img src="https://img.shields.io/badge/Photo-Pending-gray?style=flat-square" width="150" height="150" /><br>
+<h3>Sri Ashwin</h3>
+<b>Chief Technology Officer</b><br>
+Engineering leader overseeing product development and technical innovation across all platforms.
+</td>
+</tr>
+</table>
 
 **Contact**: [email@cynorsense.com](mailto:email@cynorsense.com)
 

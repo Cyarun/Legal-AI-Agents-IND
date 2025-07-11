@@ -1,8 +1,10 @@
 # 📚 Legal AI Agents Wiki
 
 <div align="center">
+<img src="https://avatars.githubusercontent.com/u/72721598?v=4" alt="CynorSense Solutions" width="100" height="100" />
 <h3>A CynorSense Solutions Product</h3>
-<p><i>Developed by Arun R M</i></p>
+<p><i>Developed by the CynorSense Leadership Team</i></p>
+<p><b>CEO</b>: Sri Uday Kiran B | <b>CIO</b>: Sri Arun R M | <b>CTO</b>: Sri Ashwin</p>
 </div>
 
 ---

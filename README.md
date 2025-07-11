@@ -2,8 +2,7 @@
 
 <div align="center">
 
-<!-- Logo placeholder - replace with actual CynorSense logo -->
-<img src="https://img.shields.io/badge/CynorSense-Solutions-0066CC?style=for-the-badge&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" alt="CynorSense Solutions" />
+<img src="https://avatars.githubusercontent.com/u/72721598?v=4" alt="CynorSense Solutions" width="120" height="120" />
 
 ![Legal AI Agents](https://img.shields.io/badge/Legal_AI-Agents-blue?style=for-the-badge&logo=law&logoColor=white)
 ![Made for India](https://img.shields.io/badge/Made_for-India-🇮🇳-orange?style=for-the-badge)
@@ -383,11 +382,29 @@ Security is our top priority. Please review our [Security Policy](SECURITY.md) f
 
 **CynorSense Solutions Pvt. Ltd.** is a leading technology company specializing in AI-powered solutions for the legal industry. We are committed to revolutionizing legal practice in India through cutting-edge artificial intelligence and machine learning technologies.
 
-### 👤 Leadership
-**Arun R M**  
-Founder & CEO  
-CynorSense Solutions Pvt. Ltd.  
-Email: [email@cynorsense.com](mailto:email@cynorsense.com)
+### 👤 Leadership Team
+
+<table>
+<tr>
+<td align="center">
+<img src="https://media.licdn.com/dms/image/v2/C5603AQHqqQDz2hHcGw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1605174373301?e=2147483647&v=beta&t=njb6Ec_kLJnJL-ZAZWh59QSQgsPQ91ACvXwCANnWGn8" width="100" height="100" /><br>
+<b>Sri Uday Kiran B</b><br>
+Chief Executive Officer
+</td>
+<td align="center">
+<img src="https://s3.amazonaws.com/media.mixrank.com/profilepic/98b414045e9b8f0c62635a32f2fb05d" width="100" height="100" /><br>
+<b>Sri Arun R M</b><br>
+Chief Information Officer
+</td>
+<td align="center">
+<img src="https://img.shields.io/badge/Photo-Pending-gray?style=flat-square" width="100" height="100" /><br>
+<b>Sri Ashwin</b><br>
+Chief Technology Officer
+</td>
+</tr>
+</table>
+
+**Contact**: [email@cynorsense.com](mailto:email@cynorsense.com)
 
 ## 🙏 Acknowledgments
 
@@ -407,7 +424,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Made with ❤️ for the Indian Legal Community**
 
 **© 2025 CynorSense Solutions Pvt. Ltd.**  
-**Author**: Arun R M  
+**CEO**: Sri Uday Kiran B  
+**CIO**: Sri Arun R M  
+**CTO**: Sri Ashwin  
 **Email**: [email@cynorsense.com](mailto:email@cynorsense.com)  
 **Website**: [www.cynorsense.com](https://cynorsense.com)
 
