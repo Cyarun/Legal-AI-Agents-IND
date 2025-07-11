@@ -41,7 +41,7 @@ jobs:
         uv run pytest -m "not integration" --cov=graphiti_core --cov-report=xml
     
     - name: Upload coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       with:
         file: ./graphiti/coverage.xml
         flags: graphiti
@@ -69,7 +69,7 @@ jobs:
         tox
     
     - name: Upload coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       with:
         file: ./unstract/coverage.xml
         flags: unstract-backend
