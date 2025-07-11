@@ -12,6 +12,9 @@ from .services.graphiti_service import graphiti_service
 from .services.unstract_service import unstract_service
 from .utils.cache import close_redis
 from .models.responses import HealthResponse, ErrorResponse
+from .graphql.schema import schema
+from .graphql.context import get_context
+from strawberry.fastapi import GraphQLRouter
 
 # Configure logging
 logging.basicConfig(
@@ -172,6 +175,14 @@ app.include_router(graph.router, prefix=settings.api_prefix)
 app.include_router(process.router, prefix=settings.api_prefix)
 app.include_router(legal.router, prefix=settings.api_prefix)
 
+# Add GraphQL endpoint
+graphql_app = GraphQLRouter(
+    schema,
+    context_getter=get_context,
+    path="/graphql"
+)
+app.include_router(graphql_app, prefix="")
+
 
 # API documentation customization
 app.openapi_tags = [
@@ -190,6 +201,10 @@ app.openapi_tags = [
     {
         "name": "Legal Analysis",
         "description": "Combined legal analysis workflows"
+    },
+    {
+        "name": "GraphQL",
+        "description": "GraphQL API for flexible querying"
     }
 ]
 

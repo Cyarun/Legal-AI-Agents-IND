@@ -1,0 +1,1 @@
+"""GraphQL API implementation for the Unified Legal AI Gateway."""
