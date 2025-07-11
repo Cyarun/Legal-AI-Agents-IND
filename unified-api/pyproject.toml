@@ -10,7 +10,7 @@ dependencies = [
     "pydantic==2.10.4",
     "python-jose[cryptography]==3.3.0",
     "python-multipart==0.0.17",
-    "redis==5.2.1",
+    "redis==6.2.0",
     "python-dotenv==1.0.1",
     "neo4j==5.26.0",
     "aiofiles==24.1.0",
